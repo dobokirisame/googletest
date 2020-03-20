@@ -2010,13 +2010,21 @@ inline bool IsDir(const StatStruct& st) { return S_ISDIR(st.st_mode); }
 
 typedef struct stat StatStruct;
 
+#ifdef GTEST_OS_NONE
+inline int FileNo(FILE* file) { return 1; }
+#else
 inline int FileNo(FILE* file) { return fileno(file); }
+#endif
 inline int IsATTY(int fd) { return isatty(fd); }
 inline int Stat(const char* path, StatStruct* buf) { return stat(path, buf); }
 inline int StrCaseCmp(const char* s1, const char* s2) {
   return strcasecmp(s1, s2);
 }
+#ifdef GTEST_OS_NONE
+inline char* StrDup(const char* src) { return nullptr; }
+#else
 inline char* StrDup(const char* src) { return strdup(src); }
+#endif
 inline int RmDir(const char* dir) { return rmdir(dir); }
 inline bool IsDir(const StatStruct& st) { return S_ISDIR(st.st_mode); }
 
@@ -2040,7 +2048,11 @@ inline FILE* FOpen(const char* path, const char* mode) {
 inline FILE *FReopen(const char* path, const char* mode, FILE* stream) {
   return freopen(path, mode, stream);
 }
+#ifdef GTEST_OS_NONE
+inline FILE* FDOpen(int fd, const char* mode) { return nullptr; }
+#else
 inline FILE* FDOpen(int fd, const char* mode) { return fdopen(fd, mode); }
+#endif
 #endif
 inline int FClose(FILE* fp) { return fclose(fp); }
 #if !GTEST_OS_WINDOWS_MOBILE
